@@ -40,4 +40,15 @@
         app:layout_constraintStart_toStartOf="@+id/post_button"
         app:layout_constraintTop_toBottomOf="@+id/post_button" />
 
+    <Button
+        android:id="@+id/multipart_request_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Multipart Request"
+        app:layout_constraintEnd_toEndOf="@+id/form_request_button"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="@+id/form_request_button"
+        app:layout_constraintTop_toBottomOf="@+id/form_request_button" />
+
 </android.support.constraint.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.addictaf.network;
 
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.FormBody;
@@ -21,8 +23,8 @@ import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG = "MAINTAG2";
-    private Button formRequest, postRequest;
+    public static final String TAG = "MAINTAG3";
+    private Button formRequest, postRequest, multipartRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         final Button button = findViewById(R.id.get_button);
         postRequest = findViewById(R.id.post_button);
         formRequest = findViewById(R.id.form_request_button);
+        multipartRequest = findViewById(R.id.multipart_request_button);
         postRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,6 +67,70 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
+        multipartRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        doMultipartRequest();
+                    }
+                }).start();
+            }
+        });
+    }
+
+    private void doMultipartRequest() {
+        String path = Environment.getExternalStorageDirectory().toString() +"/";
+        Log.d(TAG, "Path " + path);
+        File f = new File(path);
+        File files[] = f.listFiles();
+        if (files == null){
+            Log.d(TAG, "The dirrectory is null");
+            return;
+        }
+        Log.d(TAG, String.format("Number of files %s", Integer.toString(files.length)));
+        for (int i=1; i<files.length; i++)
+        {
+            if (files[i].isFile())
+            {
+                Log.d(TAG, "Filename " + files[i].getName());
+                doActualFilePost(files[i]);
+                break;
+            } else
+            {
+                Log.d(TAG, "Not a file");
+            }
+        }
+    }
+
+    private void doActualFilePost(File file) {
+        OkHttpClient client = new OkHttpClient();
+        Log.d(TAG, "Client created");
+        String url = "https://reqres.in/api/users";
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("name", "isaac")
+                .addFormDataPart("image", file.getName(),
+                        RequestBody.create(MediaType.parse("image/jpg"), file))
+                .build();
+        Log.d(TAG, "Body built");
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Log.d(TAG, "Request created");
+        Log.d(TAG, "");
+        try {
+            Response response = client.newCall(request).execute();
+            Log.d(TAG, "Response gotten");
+            Log.d(TAG, response.body().string());
+        } catch (IOException e) {
+            Log.d(TAG, "exception gotten");
+            Log.d(TAG, e.toString());
+            e.printStackTrace();
+
+        }
     }
 
     private void doFormDataRequest() {
@@ -137,6 +204,5 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.d(TAG, "Error found");
         }
-
     }
 }
