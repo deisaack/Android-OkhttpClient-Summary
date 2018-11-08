@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void doMultipartRequest() {
         String path = Environment.getExternalStorageDirectory().toString() +"/";
         Log.d(TAG, "Path " + path);
